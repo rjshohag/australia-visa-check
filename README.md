@@ -1,2 +1,960 @@
-# australia-visa-check
-Australia Visa Information 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Australia Visa Check | Demo Website</title>
+
+  <meta
+    name="description"
+    content="Independent demonstration website for sample Australian visa information records. Not an official government service."
+  >
+
+  <style>
+    :root {
+      --navy: #102b4e;
+      --blue: #1769aa;
+      --green: #087f5b;
+      --red: #b42318;
+      --bg: #f3f6fa;
+      --border: #dce3ec;
+      --text: #182230;
+      --muted: #667085;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    header {
+      background: var(--navy);
+      color: white;
+      padding: 25px 16px;
+      text-align: center;
+    }
+
+    .brand {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      color: #dbeafe;
+    }
+
+    .demo-banner {
+      padding: 13px 16px;
+      background: #fff0c2;
+      color: #713f12;
+      border-bottom: 1px solid #f3d58a;
+      text-align: center;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    main {
+      max-width: 900px;
+      padding: 24px 15px 45px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      margin-bottom: 22px;
+      box-shadow: 0 4px 18px rgba(16, 43, 78, 0.06);
+      border: 1px solid var(--border);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: var(--navy);
+      font-size: 22px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    input,
+    select,
+    textarea {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: inherit;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid #93c5fd;
+      border-color: var(--blue);
+    }
+
+    button {
+      border: 0;
+      padding: 12px 17px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 14px;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .primary {
+      color: white;
+      background: var(--blue);
+    }
+
+    .success {
+      color: white;
+      background: var(--green);
+    }
+
+    .danger {
+      color: white;
+      background: var(--red);
+    }
+
+    .secondary {
+      color: var(--navy);
+      background: #e8eef6;
+    }
+
+    .full {
+      width: 100%;
+    }
+
+    .message {
+      padding: 12px;
+      margin-top: 14px;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+      display: none;
+      font-size: 14px;
+    }
+
+    .message.info {
+      display: block;
+      color: #164e63;
+      background: #e0f2fe;
+    }
+
+    .message.error {
+      display: block;
+      color: #991b1b;
+      background: #fee2e2;
+    }
+
+    .message.ok {
+      display: block;
+      color: #166534;
+      background: #dcfce7;
+    }
+
+    .result {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      margin-top: 18px;
+      background: #fafcff;
+      overflow-wrap: anywhere;
+    }
+
+    .result h3 {
+      margin-top: 0;
+      color: var(--navy);
+    }
+
+    .result-row {
+      padding: 8px 0;
+      border-bottom: 1px solid #e8edf3;
+    }
+
+    .result-row:last-child {
+      border-bottom: 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: #e8eef6;
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .record {
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
+      overflow-wrap: anywhere;
+    }
+
+    .record:last-child {
+      border-bottom: 0;
+    }
+
+    .record-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .record-buttons button {
+      margin-top: 8px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .notice {
+      border-left: 4px solid #e0a100;
+      background: #fff8e6;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #694b00;
+      border-radius: 5px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+      .brand {
+        font-size: 23px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1 class="brand">Australia Visa Check</h1>
+    <p>Independent Visa Information Demonstration</p>
+  </header>
+
+  <div class="demo-banner">
+    DEMO WEBSITE — NOT AN AUSTRALIAN GOVERNMENT SERVICE
+  </div>
+
+  <main>
+
+    <section class="card">
+      <h2>Visa Information Lookup</h2>
+
+      <p class="muted">
+        Enter a demonstration reference number to search sample records
+        stored on this website.
+      </p>
+
+      <div class="notice">
+        This website is independently operated and is not affiliated with
+        the Australian Government. Results are demonstration records only.
+        They cannot verify real visas or access government immigration records.
+        Do not enter passport numbers or real personal visa information.
+      </div>
+
+      <form id="searchForm">
+        <label for="referenceNumber">Demo Reference Number</label>
+
+        <input
+          id="referenceNumber"
+          type="text"
+          maxlength="100"
+          placeholder="Enter demo reference number"
+          autocomplete="off"
+          required
+        >
+
+        <button class="primary full" id="searchButton" type="submit">
+          Search Demo Record
+        </button>
+      </form>
+
+      <div id="searchMessage" class="message" role="status"></div>
+      <div id="searchResult"></div>
+    </section>
+
+    <section class="card">
+      <h2>Administrator Login</h2>
+
+      <p class="muted">
+        Authorized administrator access for managing demonstration records.
+      </p>
+
+      <form id="loginForm">
+        <label for="adminEmail">Administrator Email</label>
+        <input
+          id="adminEmail"
+          type="email"
+          autocomplete="username"
+          placeholder="Enter your admin email"
+          required
+        >
+
+        <label for="adminPassword">Password</label>
+        <input
+          id="adminPassword"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Enter your password"
+          required
+        >
+
+        <button class="primary full" id="loginButton" type="submit">
+          Sign In
+        </button>
+      </form>
+
+      <div id="loginMessage" class="message" role="status"></div>
+    </section>
+
+    <section id="adminPanel" class="card hidden">
+      <h2>Administrator Dashboard</h2>
+
+      <p id="adminIdentity" class="muted"></p>
+
+      <button id="logoutButton" class="secondary" type="button">
+        Sign Out
+      </button>
+
+      <hr style="margin: 24px 0; border: 0; border-top: 1px solid #dce3ec;">
+
+      <h2 id="formTitle">Add Demo Record</h2>
+
+      <form id="recordForm">
+        <input id="recordId" type="hidden">
+
+        <label for="recordReference">Demo Reference Number</label>
+        <input
+          id="recordReference"
+          type="text"
+          maxlength="100"
+          placeholder="Example: DEMO-771-001"
+          required
+        >
+
+        <label for="recordCategory">Demonstration Category</label>
+        <select id="recordCategory" required>
+          <option value="Transit Visa (Subclass 771)">
+            Transit Visa (Subclass 771)
+          </option>
+          <option value="Medical Treatment Visa (Subclass 602)">
+            Medical Treatment Visa (Subclass 602)
+          </option>
+          <option value="Other Demonstration Category">
+            Other Demonstration Category
+          </option>
+        </select>
+
+        <label for="recordStatus">Sample Record Status</label>
+        <select id="recordStatus" required>
+          <option value="Demonstration Record">Demonstration Record</option>
+          <option value="Sample Information Only">Sample Information Only</option>
+          <option value="Example Record">Example Record</option>
+        </select>
+
+        <label for="recordNotes">Demo Notes</label>
+        <textarea
+          id="recordNotes"
+          rows="4"
+          maxlength="2000"
+          placeholder="Enter sample information only. Do not enter real personal data."
+        ></textarea>
+
+        <button class="success" id="saveRecordButton" type="submit">
+          Save Demo Record
+        </button>
+
+        <button
+          class="secondary hidden"
+          id="cancelEditButton"
+          type="button"
+        >
+          Cancel Edit
+        </button>
+      </form>
+
+      <div id="recordMessage" class="message" role="status"></div>
+
+      <hr style="margin: 28px 0; border: 0; border-top: 1px solid #dce3ec;">
+
+      <h2>Manage Demo Records</h2>
+
+      <button class="secondary" id="refreshButton" type="button">
+        Refresh Records
+      </button>
+
+      <div id="recordsList">
+        <p class="muted">Sign in as an authorized administrator to load records.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>
+      Independent demonstration website. Not affiliated with the Australian
+      Government, Department of Home Affairs, or any visa authority.
+    </p>
+    <p>All displayed records are illustrative sample data only.</p>
+  </footer>
+
+  <script type="module">
+    import { createClient } from
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+    // Supabase project settings
+    const SUPABASE_URL =
+      "https://avwmayqvpnhxhixwmynp.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_7xaXdpYiG_dRNiYSv0gAPg_yecEpC8_";
+
+    const supabase = createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    const $ = (id) => document.getElementById(id);
+
+    let currentUser = null;
+    let isAuthorizedAdmin = false;
+
+    function showMessage(id, message, type = "info") {
+      const el = $(id);
+      el.textContent = message;
+      el.className = "message " + type;
+    }
+
+    function clearMessage(id) {
+      const el = $(id);
+      el.textContent = "";
+      el.className = "message";
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (char) => {
+        const entities = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        };
+
+        return entities[char];
+      });
+    }
+
+    function formatDate(value) {
+      if (!value) return "Not provided";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "Not provided";
+      }
+
+      return date.toLocaleString();
+    }
+
+    function showSearchResult(record) {
+      $("searchResult").innerHTML = `
+        <div class="result">
+          <h3>Demonstration Record Found</h3>
+
+          <div class="notice">
+            SAMPLE RESULT ONLY — This is not proof of a real visa,
+            visa grant, application, or government decision.
+          </div>
+
+          <div class="result-row">
+            <strong>Demo Reference:</strong>
+            ${escapeHTML(record.reference_number)}
+          </div>
+
+          <div class="result-row">
+            <strong>Demo Category:</strong>
+            ${escapeHTML(record.visa_category)}
+          </div>
+
+          <div class="result-row">
+            <strong>Sample Status:</strong>
+            <span class="badge">
+              ${escapeHTML(record.status)}
+            </span>
+          </div>
+
+          <div class="result-row">
+            <strong>Demo Notes:</strong>
+            ${escapeHTML(record.notes || "No sample notes provided")}
+          </div>
+
+          <div class="result-row">
+            <strong>Record Created:</strong>
+            ${escapeHTML(formatDate(record.created_at))}
+          </div>
+        </div>
+      `;
+    }
+
+    $("searchForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      clearMessage("searchMessage");
+      $("searchResult").replaceChildren();
+
+      const reference = $("referenceNumber").value.trim();
+
+      if (!reference) {
+        showMessage(
+          "searchMessage",
+          "Please enter a demo reference number.",
+          "error"
+        );
+        return;
+      }
+
+      $("searchButton").disabled = true;
+      $("searchButton").textContent = "Searching...";
+
+      try {
+        const { data, error } = await supabase
+          .from("visa_demo_records")
+          .select("reference_number, visa_category, status, notes, created_at")
+          .eq("reference_number", reference)
+          .limit(1);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          showMessage(
+            "searchMessage",
+            "No matching demonstration record was found. This does not indicate anything about a real visa or application.",
+            "info"
+          );
+          return;
+        }
+
+        showSearchResult(data[0]);
+
+      } catch (error) {
+        console.error("Demo lookup error:", error);
+
+        showMessage(
+          "searchMessage",
+          "Unable to search records right now. Check the Supabase connection and database permissions.",
+          "error"
+        );
+      } finally {
+        $("searchButton").disabled = false;
+        $("searchButton").textContent = "Search Demo Record";
+      }
+    });
+
+    async function checkAdmin(user) {
+      if (!user) return false;
+
+      const { data, error } = await supabase.rpc("is_visa_admin");
+
+      if (error) {
+        console.error("Admin verification error:", error);
+        return false;
+      }
+
+      return data === true;
+    }
+
+    async function updateAdminUI(user) {
+      currentUser = user || null;
+      isAuthorizedAdmin = false;
+
+      $("adminPanel").classList.add("hidden");
+      $("adminIdentity").textContent = "";
+      $("loginForm").classList.remove("hidden");
+
+      if (!user) {
+        $("recordsList").textContent =
+          "Sign in as an authorized administrator to load records.";
+        return;
+      }
+
+      $("loginForm").classList.add("hidden");
+
+      const authorized = await checkAdmin(user);
+
+      // Avoid displaying the admin dashboard to non-admin accounts.
+      if (!authorized) {
+        $("adminPanel").classList.add("hidden");
+
+        showMessage(
+          "loginMessage",
+          "This account is signed in but is not authorized to manage demo records.",
+          "error"
+        );
+
+        $("loginForm").classList.remove("hidden");
+        $("recordsList").textContent =
+          "Administrator authorization is required.";
+
+        return;
+      }
+
+      isAuthorizedAdmin = true;
+      $("adminPanel").classList.remove("hidden");
+      $("adminIdentity").textContent =
+        "Signed in as authorized administrator: " + user.email;
+
+      clearMessage("loginMessage");
+
+      await loadRecords();
+    }
+
+    $("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      clearMessage("loginMessage");
+
+      $("loginButton").disabled = true;
+      $("loginButton").textContent = "Signing in...";
+
+      try {
+        const email = $("adminEmail").value.trim();
+        const password = $("adminPassword").value;
+
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        await updateAdminUI(data.user);
+
+      } catch (error) {
+        console.error("Login error:", error);
+
+        showMessage(
+          "loginMessage",
+          "Sign-in failed. Check your email, password, and Supabase Auth settings.",
+          "error"
+        );
+      } finally {
+        $("loginButton").disabled = false;
+        $("loginButton").textContent = "Sign In";
+      }
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        showMessage("recordMessage", error.message, "error");
+        return;
+      }
+
+      currentUser = null;
+      isAuthorizedAdmin = false;
+
+      $("adminPanel").classList.add("hidden");
+      $("loginForm").classList.remove("hidden");
+      $("recordsList").textContent = "You have signed out.";
+
+      clearMessage("loginMessage");
+      clearMessage("recordMessage");
+    });
+
+    function resetRecordForm() {
+      $("recordForm").reset();
+      $("recordId").value = "";
+      $("formTitle").textContent = "Add Demo Record";
+      $("saveRecordButton").textContent = "Save Demo Record";
+      $("cancelEditButton").classList.add("hidden");
+    }
+
+    $("cancelEditButton").addEventListener("click", () => {
+      resetRecordForm();
+      clearMessage("recordMessage");
+    });
+
+    $("recordForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      clearMessage("recordMessage");
+
+      if (!currentUser || !isAuthorizedAdmin) {
+        showMessage(
+          "recordMessage",
+          "Only an authorized administrator can manage records.",
+          "error"
+        );
+        return;
+      }
+
+      const reference = $("recordReference").value.trim();
+      const category = $("recordCategory").value;
+      const status = $("recordStatus").value;
+      const notes = $("recordNotes").value.trim();
+      const recordId = $("recordId").value;
+
+      if (!reference) {
+        showMessage(
+          "recordMessage",
+          "Please enter a demo reference number.",
+          "error"
+        );
+        return;
+      }
+
+      const record = {
+        reference_number: reference,
+        visa_category: category,
+        status,
+        notes
+      };
+
+      $("saveRecordButton").disabled = true;
+
+      try {
+        let response;
+
+        if (recordId) {
+          response = await supabase
+            .from("visa_demo_records")
+            .update(record)
+            .eq("id", recordId);
+        } else {
+          response = await supabase
+            .from("visa_demo_records")
+            .insert([record]);
+        }
+
+        if (response.error) throw response.error;
+
+        showMessage(
+          "recordMessage",
+          recordId
+            ? "Demonstration record updated successfully."
+            : "Demonstration record added successfully.",
+          "ok"
+        );
+
+        resetRecordForm();
+        await loadRecords();
+
+      } catch (error) {
+        console.error("Save record error:", error);
+
+        showMessage(
+          "recordMessage",
+          "Could not save the record. Check your database table, permissions, and admin authorization.",
+          "error"
+        );
+      } finally {
+        $("saveRecordButton").disabled = false;
+      }
+    });
+
+    async function loadRecords() {
+      if (!currentUser || !isAuthorizedAdmin) {
+        $("recordsList").textContent =
+          "Authorized administrator access is required.";
+        return;
+      }
+
+      $("recordsList").textContent = "Loading demonstration records...";
+
+      try {
+        const { data, error } = await supabase
+          .from("visa_demo_records")
+          .select("id, reference_number, visa_category, status, notes, created_at")
+          .order("created_at", { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          $("recordsList").textContent =
+            "No demonstration records yet. Add your first sample record above.";
+          return;
+        }
+
+        $("recordsList").innerHTML = data.map((record) => `
+          <div class="record">
+            <strong>${escapeHTML(record.reference_number)}</strong>
+
+            <p class="muted">
+              ${escapeHTML(record.visa_category)}
+              · ${escapeHTML(record.status)}
+            </p>
+
+            <p>${escapeHTML(record.notes || "No demo notes")}</p>
+
+            <p class="muted">
+              Created: ${escapeHTML(formatDate(record.created_at))}
+            </p>
+
+            <div class="record-buttons">
+              <button
+                class="secondary"
+                type="button"
+                data-action="edit"
+                data-id="${escapeHTML(record.id)}"
+              >
+                Edit
+              </button>
+
+              <button
+                class="danger"
+                type="button"
+                data-action="delete"
+                data-id="${escapeHTML(record.id)}"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        `).join("");
+
+      } catch (error) {
+        console.error("Load records error:", error);
+
+        $("recordsList").textContent =
+          "Could not load records. Check the Supabase database and administrator permissions.";
+      }
+    }
+
+    $("recordsList").addEventListener("click", async (event) => {
+      const button = event.target.closest("button[data-action]");
+
+      if (!button || !isAuthorizedAdmin) return;
+
+      const recordId = button.dataset.id;
+      const action = button.dataset.action;
+
+      if (action === "edit") {
+        const { data, error } = await supabase
+          .from("visa_demo_records")
+          .select("id, reference_number, visa_category, status, notes")
+          .eq("id", recordId)
+          .single();
+
+        if (error || !data) {
+          showMessage(
+            "recordMessage",
+            "Could not open this record for editing.",
+            "error"
+          );
+          return;
+        }
+
+        $("recordId").value = data.id;
+        $("recordReference").value = data.reference_number;
+        $("recordCategory").value = data.visa_category;
+        $("recordStatus").value = data.status;
+        $("recordNotes").value = data.notes || "";
+
+        $("formTitle").textContent = "Edit Demo Record";
+        $("saveRecordButton").textContent = "Update Demo Record";
+        $("cancelEditButton").classList.remove("hidden");
+
+        $("recordForm").scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }
+
+      if (action === "delete") {
+        const confirmed = window.confirm(
+          "Delete this demonstration record permanently?"
+        );
+
+        if (!confirmed) return;
+
+        const { error } = await supabase
+          .from("visa_demo_records")
+          .delete()
+          .eq("id", recordId);
+
+        if (error) {
+          showMessage(
+            "recordMessage",
+            "Could not delete the record. Check administrator permissions.",
+            "error"
+          );
+          return;
+        }
+
+        showMessage(
+          "recordMessage",
+          "Demonstration record deleted.",
+          "ok"
+        );
+
+        await loadRecords();
+      }
+    });
+
+    $("refreshButton").addEventListener("click", loadRecords);
+
+    // Restore an existing login session when the page is reopened.
+    const { data: sessionData } = await supabase.auth.getSession();
+
+    if (sessionData.session?.user) {
+      await updateAdminUI(sessionData.session.user);
+    }
+
+    // Handle sign-in and sign-out changes without blocking the auth callback.
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setTimeout(() => {
+        updateAdminUI(session?.user || null);
+      }, 0);
+    });
+  </script>
+
+</body>
+</html>
