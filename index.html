@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Australia Visa Information Demo</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f6f8;
+  color:#243247;
+}
+header{
+  background:#fff;
+  padding:20px 15px;
+  border-bottom:4px solid #087b52;
+}
+.container{max-width:650px;margin:auto;padding:20px}
+.brand{font-size:23px;font-weight:bold;color:#075b40}
+.notice{
+  background:#fff4d6;
+  border:1px solid #e7c96b;
+  padding:12px;
+  border-radius:8px;
+  font-size:13px;
+  line-height:1.6;
+  margin-bottom:20px;
+}
+.card{
+  background:white;
+  padding:23px;
+  border-radius:12px;
+  box-shadow:0 3px 15px #00000010;
+}
+h1{font-size:25px;margin-top:0}
+p{line-height:1.6;color:#526174}
+label{display:block;margin:17px 0 7px;font-weight:bold}
+input,select{
+  width:100%;
+  padding:13px;
+  border:1px solid #bdc7d1;
+  border-radius:6px;
+  font-size:16px;
+  background:white;
+}
+button{
+  width:100%;
+  margin-top:22px;
+  padding:14px;
+  border:0;
+  border-radius:6px;
+  background:#087b52;
+  color:white;
+  font-size:17px;
+  font-weight:bold;
+}
+#result{
+  display:none;
+  margin-top:20px;
+  padding:15px;
+  border-radius:8px;
+  background:#eef5ff;
+  line-height:1.7;
+  overflow-wrap:anywhere;
+}
+footer{text-align:center;padding:25px;font-size:12px;color:#687687}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="container" style="padding:0 10px">
+    <div class="brand">AUSTRALIA VISA INFORMATION</div>
+    <div style="font-size:12px;margin-top:6px">
+      Independent demonstration website
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="notice">
+    <strong>DEMO WEBSITE — NOT A GOVERNMENT SERVICE</strong><br>
+    This website is not affiliated with the Australian Government.
+    It cannot verify real visas or access government records.
+  </div>
+
+  <section class="card">
+    <h1>Visa Information Lookup</h1>
+    <p>
+      Enter a demonstration reference number to view a sample result.
+      Do not enter passport numbers or personal visa information.
+    </p>
+
+    <form id="visaForm">
+      <label for="reference">Demo Reference Number</label>
+      <input id="reference" placeholder="Example: DEMO123" required>
+
+      <label for="visaType">Visa Category</label>
+      <select id="visaType">
+        <option value="771">Transit Visa (Subclass 771)</option>
+        <option value="602">Medical Treatment Visa (Subclass 602)</option>
+        <option value="other">Other visa category</option>
+      </select>
+
+      <button type="submit">View Demo Result</button>
+    </form>
+
+    <div id="result" role="status"></div>
+  </section>
+</main>
+
+<footer>
+  Independent demo only. Not an official Australian Government website.
+  <br>Sample information is not proof of visa status.
+</footer>
+
+<script>
+document.getElementById("visaForm").addEventListener("submit",function(e){
+  e.preventDefault();
+
+  const ref=document.getElementById("reference").value.trim();
+  const type=document.getElementById("visaType");
+  const result=document.getElementById("result");
+
+  if(!ref){
+    result.style.display="block";
+    result.textContent="Please enter a demo reference number.";
+    return;
+  }
+
+  result.style.display="block";
+  result.innerHTML=
+    "<strong>DEMONSTRATION RESULT</strong><br>"+
+    "Reference: "+ref.replace(/[&<>"']/g,"") .replace(/[\r\n]/g,"")+
+    "<br>Selected category: "+type.options[type.selectedIndex].text+
+    "<br><strong>Status: SAMPLE ONLY — NOT VERIFIED</strong>"+
+    "<br>This result does not represent an actual visa or government record.";
+});
+</script>
+</body>
+</html>
