@@ -814,7 +814,7 @@
       try {
         const { data, error } = await supabase
           .from("visa_demo_records")
-          .select("id, reference_number, visa_category, status, notes, created_at")
+          .select("id, reference_number, visa_category, status, note, created_at")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -834,7 +834,7 @@
               · ${escapeHTML(record.status)}
             </p>
 
-            <p>${escapeHTML(record.notes || "No demo notes")}</p>
+            <p>${escapeHTML(record.notes || "No demo note")}</p>
 
             <p class="muted">
               Created: ${escapeHTML(formatDate(record.created_at))}
