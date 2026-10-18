@@ -568,7 +568,7 @@
       try {
         const { data, error } = await supabase
           .from("visa_demo_records")
-          .select("reference_number, visa_category, status, notes, created_at")
+          .select("reference_number, visa_category, status, note, created_at")
           .eq("reference_number", reference)
           .limit(1);
 
@@ -757,7 +757,7 @@
         reference_number: reference,
         visa_category: category,
         status,
-        notes
+        note:  notes
       };
 
       $("saveRecordButton").disabled = true;
@@ -881,7 +881,7 @@
       if (action === "edit") {
         const { data, error } = await supabase
           .from("visa_demo_records")
-          .select("id, reference_number, visa_category, status, notes")
+          .select("id, reference_number, visa_category, status, note")
           .eq("id", recordId)
           .single();
 
