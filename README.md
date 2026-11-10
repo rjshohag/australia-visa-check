@@ -87,3 +87,8 @@ Before testing admin functions, configure Supabase Auth, apply and review the SQ
 ## Scope and limitations
 
 This repository is a demonstration interface, not a visa verification product, immigration service, legal service, or government portal. It does not query Australian government records and must not be marketed or described as verifying genuine visas or applications. All labels, categories, statuses, and notes shown by the app are illustrative sample data.
+
+
+## Additional security review
+
+Before deployment, run the read-only catalog checks in [supabase/VERIFY_SECURITY.sql](supabase/VERIFY_SECURITY.sql). The repository does not establish the live `note`/`notes` column, current grants/policies, or deployed function owner; those require results from the actual Supabase project. See [Supabase security review and rollback notes](supabase/README.md). No SQL is run automatically.

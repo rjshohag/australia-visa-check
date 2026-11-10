@@ -1,42 +1,60 @@
-# Supabase security setup
+# Supabase security review and deployment notes
 
-This directory documents a **manual setup template**, not an automatically deployed migration. The repository has no verified database schema export and no connection to the project's Supabase database. Review every statement against the target project before running it.
+**No live Supabase SQL has been run for this pull request.** This repository contains no schema dump, migration history, live catalog output, or database credentials. Existing policies/grants, actual column spelling, and deployed function ownership cannot be verified from GitHub alone.
 
-## Assumptions
+## Preflight review
 
-- `public.visa_demo_records` already exists.
-- It contains only synthetic demonstration rows, never real visa, passport, identity, or other sensitive information.
-- The frontend uses the `notes` column (plural), plus `id`, `reference_number`, `visa_category`, `status`, and `created_at`.
-- Public lookup is intentionally public. The current frontend reads `visa_demo_records` directly, so the template grants SELECT to `anon` and `authenticated` and adds a public SELECT policy. This makes all rows and columns on that table readable through the Supabase API, not just the columns selected by the UI. If the table contains anything private, do not use this policy: implement a server-side lookup or a carefully designed view/RPC and grant access only to that interface.
+1. Run [VERIFY_SECURITY.sql](VERIFY_SECURITY.sql) manually against the intended Supabase project.
+2. Save results securely; do not paste credentials, JWTs, or sensitive row data into GitHub.
+3. Confirm whether `visa_demo_records` has `note` or `notes`. The frontend in this branch expects `notes`. The old HTML selected `note` while reading/writing `notes`, but that does not prove the live schema.
+4. Inspect all policies and grants. PostgreSQL permissive policies combine with OR; a pre-existing `USING (true)` policy can continue to permit access despite a new admin-only policy. Inspect grants to PUBLIC, inherited role grants, and effective privileges too.
+5. If any policy/grant is broader than intended, stop and reconcile it in a separately reviewed migration. Do not blindly drop or overwrite existing policies.
+6. Back up and test in staging first.
 
-## Function requirements
+## Function owner and permissions
 
-`public.is_visa_admin()` must:
-- Derive identity from `auth.uid()`, never a user ID/email argument from the browser.
-- Check membership in a server-controlled `public.visa_admins` allow-list.
-- Be `STABLE`, narrowly scoped, and `SECURITY DEFINER` only because the allow-list is intentionally not directly readable by clients.
-- Set an empty/pinned `search_path` and fully qualify referenced objects.
-- Have EXECUTE revoked from PUBLIC and granted only to authenticated users.
-- Be owned by a trusted database role with the minimum required access.
+The template defines `public.is_visa_admin()` as `SECURITY DEFINER`, `STABLE`, with an empty `search_path`, schema-qualified references, and no caller-supplied identity. It assigns the owner to the trusted Supabase `postgres` role, intended to read the protected `visa_admins` table. It revokes EXECUTE from PUBLIC/anon/authenticated, then grants it only to authenticated.
 
-The setup SQL creates a private allow-list table and this function. Add an administrator only after verifying their Auth UUID in the Supabase dashboard. Remove the row to revoke the allow-list membership.
+Validate this owner against the project's role model before applying. Confirm owner, `prosecdef`, definition, settings, and ACL with query 6; confirm effective EXECUTE with query 7. The owner must be trusted and not client-controlled. Keep the body static; no dynamic SQL or caller-controlled identifiers.
 
-## RLS requirements
+The template uses `CREATE TABLE` and `CREATE FUNCTION` without `IF NOT EXISTS` or `OR REPLACE`. If either object exists already, the script stops instead of silently adopting or replacing an object whose ownership or behavior has not been audited.
 
-The template enables RLS on both tables. It grants no direct client access to `visa_admins`. For `visa_demo_records`, it grants public SELECT to support the current public demo lookup, and admin-only INSERT, UPDATE, and DELETE. The admin policies call `is_visa_admin()`; the frontend's `isAuthorizedAdmin` flag is never treated as enforcement.
+## RLS and public lookup
 
-If your actual table has sensitive columns or should not be publicly enumerable, do not apply the public SELECT policy. Replace direct table lookup with a backend endpoint/RPC that returns only the intended public sample fields. RLS is row-level, not column-level.
+The template is admin-only: no anonymous SELECT grant or policy is created. The current browser app performs a direct public table lookup, so anonymous lookup will be denied after this strict policy set is applied. This is intentional until a separately reviewed public-safe view/RPC/backend endpoint exists.
+
+Prefer a narrowly scoped endpoint/view/RPC returning only safe sample fields. Do not add `USING (true)` to the base table unless every row and every column is safe for public exposure. RLS filters rows, not columns.
 
 ## Apply and test
 
-1. Back up the database and inspect existing grants, RLS status, and policies.
-2. Confirm table and column names, then review `SECURITY_SETUP.sql`.
-3. Run it manually in the intended Supabase project's SQL editor or deployment pipeline.
-4. Insert the verified Auth UUID for the administrator.
-5. Test with an anonymous client, a signed-in non-admin, and an allow-listed admin:
-   - Anonymous: may read demo rows only if public lookup is intentionally enabled; must not write.
-   - Signed-in non-admin: must not insert, update, or delete.
-   - Admin: may perform intended CRUD; removing their allow-list row must remove write access.
-6. Confirm the public API cannot reveal any real or sensitive data.
+- Review [SECURITY_SETUP.sql](SECURITY_SETUP.sql) only after understanding preflight output.
+- Reconcile existing policies/grants manually; do not run on top of unknown policies.
+- Confirm actual columns and resolve `note` versus `notes` before applying.
+- Apply in staging, add only a verified Auth UUID to `visa_admins`, and test anonymous, non-admin, and admin clients.
+- Verify removing an allow-list row revokes admin access and no other permissive policy restores it.
 
-Do not place service-role keys, database passwords, secret API keys, or user tokens in browser code, SQL checked into source control, or issue/PR comments.
+## Rollback plan
+
+Rollback is manual and must be adapted to the pre-deployment catalog snapshot. Do not blindly drop objects that may have existed before this change.
+
+If the template was applied to a previously clean schema and these four policy names were created by it, the following reverses those new policies/grants:
+
+```sql
+begin;
+drop policy if exists "Visa admins can read demo records" on public.visa_demo_records;
+drop policy if exists "Visa admins can insert demo records" on public.visa_demo_records;
+drop policy if exists "Visa admins can update demo records" on public.visa_demo_records;
+drop policy if exists "Visa admins can delete demo records" on public.visa_demo_records;
+revoke select, insert, update, delete on table public.visa_demo_records from authenticated;
+revoke all on function public.is_visa_admin() from public, anon, authenticated;
+drop function if exists public.is_visa_admin();
+revoke all on table public.visa_admins from public, anon, authenticated;
+drop table if exists public.visa_admins;
+commit;
+```
+
+This does not disable RLS on `visa_demo_records`, drop the records table, restore prior grants/policies, or restore a previous function definition. Restore those only from the saved snapshot and an explicitly reviewed migration. If an object existed beforehand, do not run its DROP. Preserve allow-list membership before dropping the allow-list table.
+
+## Data and secrets
+
+Only synthetic demonstration data belongs here. Never store real passport/visa data. Never commit service-role keys, secret API keys, database passwords, or user tokens. A publishable browser key is not a database authorization mechanism; RLS and grants are the security boundary.

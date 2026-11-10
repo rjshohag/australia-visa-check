@@ -1,21 +1,24 @@
--- Security setup template for the demo application.
--- REVIEW BEFORE RUNNING: assumes public.visa_demo_records already exists and
--- contains only synthetic, non-sensitive demonstration rows.
--- This script does not create or alter the demo records table.
+-- SECURITY TEMPLATE — NOT EXECUTED.
+-- Read supabase/README.md and run VERIFY_SECURITY.sql first.
+-- Stop if the real schema, existing grants, policies, or function owner are
+-- unknown. This template deliberately does NOT enable anonymous table reads.
+-- It assumes public.visa_demo_records already exists and contains demo data.
 
 begin;
 
-create table if not exists public.visa_admins (
+-- Intentionally fail if this table already exists: inspect/reconcile it first.
+create table public.visa_admins (
   user_id uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
 );
 
+alter table public.visa_admins owner to postgres;
 alter table public.visa_admins enable row level security;
+revoke all on table public.visa_admins from public, anon, authenticated;
 
--- No browser role receives direct access to the administrator allow-list.
-revoke all on table public.visa_admins from anon, authenticated;
-
-create or replace function public.is_visa_admin()
+-- Intentionally fail if this function already exists: inspect it before
+-- deciding whether replacement is safe.
+create function public.is_visa_admin()
 returns boolean
 language sql
 stable
@@ -29,52 +32,39 @@ as $function$
   );
 $function$;
 
--- The function owner must be a trusted database role that can read visa_admins.
-revoke all on function public.is_visa_admin() from public;
+-- Trusted Supabase owner can read the protected allow-list. Validate owner
+-- against your project role model before applying.
+alter function public.is_visa_admin() owner to postgres;
+revoke all on function public.is_visa_admin() from public, anon, authenticated;
 grant execute on function public.is_visa_admin() to authenticated;
 
--- RLS is the actual security boundary. UI checks are not authorization.
 alter table public.visa_demo_records enable row level security;
 
--- The current public lookup reads this table directly. This policy permits
--- public reads of every row, so keep this table strictly synthetic.
-drop policy if exists "Public can read demo records" on public.visa_demo_records;
-create policy "Public can read demo records"
-  on public.visa_demo_records
-  for select
-  to anon, authenticated
-  using (true);
+-- Admin-only access. No anon SELECT grant/policy is created.
+-- Anonymous lookup in the current browser app will be denied until a
+-- separately reviewed public-safe view/RPC/backend endpoint is implemented.
+create policy "Visa admins can read demo records"
+  on public.visa_demo_records for select to authenticated
+  using ((select public.is_visa_admin()));
 
-drop policy if exists "Visa admins can insert demo records" on public.visa_demo_records;
 create policy "Visa admins can insert demo records"
-  on public.visa_demo_records
-  for insert
-  to authenticated
+  on public.visa_demo_records for insert to authenticated
   with check ((select public.is_visa_admin()));
 
-drop policy if exists "Visa admins can update demo records" on public.visa_demo_records;
 create policy "Visa admins can update demo records"
-  on public.visa_demo_records
-  for update
-  to authenticated
+  on public.visa_demo_records for update to authenticated
   using ((select public.is_visa_admin()))
   with check ((select public.is_visa_admin()));
 
-drop policy if exists "Visa admins can delete demo records" on public.visa_demo_records;
 create policy "Visa admins can delete demo records"
-  on public.visa_demo_records
-  for delete
-  to authenticated
+  on public.visa_demo_records for delete to authenticated
   using ((select public.is_visa_admin()));
 
-grant select on table public.visa_demo_records to anon, authenticated;
-grant insert, update, delete on table public.visa_demo_records to authenticated;
+revoke all on table public.visa_demo_records from public, anon, authenticated;
+grant select, insert, update, delete on table public.visa_demo_records to authenticated;
 
 commit;
 
--- Bootstrap an administrator manually after creating the Auth user:
+-- Bootstrap only after verifying the user's UUID in Supabase Auth:
 -- insert into public.visa_admins (user_id)
--- values ('REPLACE-WITH-AUTH-USER-UUID');
---
--- Never add an administrator based only on an email supplied by the browser.
--- Verify the UUID in Supabase Auth before inserting it.
+-- values ('REPLACE-WITH-VERIFIED-AUTH-USER-UUID');
