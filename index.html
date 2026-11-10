@@ -38,7 +38,7 @@
     header {
       background: var(--navy);
       color: white;
-      padding: 25px 16px;
+      padding: 34px 20px;
       text-align: center;
     }
 
@@ -72,9 +72,9 @@
     .card {
       background: white;
       padding: 24px;
-      border-radius: 14px;
+      border-radius: 18px;
       margin-bottom: 22px;
-      box-shadow: 0 4px 18px rgba(16, 43, 78, 0.06);
+      box-shadow: 0 12px 32px rgba(16, 43, 78, 0.08);
       border: 1px solid var(--border);
     }
 
@@ -111,7 +111,8 @@
     input:focus,
     select:focus,
     textarea:focus {
-      outline: 2px solid #93c5fd;
+      outline: 3px solid #93c5fd;
+      outline-offset: 2px;
       border-color: var(--blue);
     }
 
@@ -232,6 +233,16 @@
 
     .record-buttons button {
       margin-top: 8px;
+    }
+
+    button:hover:not(:disabled) {
+      filter: brightness(0.96);
+      transform: translateY(-1px);
+    }
+
+    button:focus-visible {
+      outline: 3px solid #93c5fd;
+      outline-offset: 2px;
     }
 
     .hidden {
@@ -568,7 +579,7 @@
       try {
         const { data, error } = await supabase
           .from("visa_demo_records")
-          .select("reference_number, visa_category, status, note, created_at")
+          .select("reference_number, visa_category, status, notes, created_at")
           .eq("reference_number", reference)
           .limit(1);
 
@@ -757,7 +768,7 @@
         reference_number: reference,
         visa_category: category,
         status,
-        note:  notes
+        notes,
       };
 
       $("saveRecordButton").disabled = true;
@@ -814,7 +825,7 @@
       try {
         const { data, error } = await supabase
           .from("visa_demo_records")
-          .select("id, reference_number, visa_category, status, note, created_at")
+          .select("id, reference_number, visa_category, status, notes, created_at")
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -881,7 +892,7 @@
       if (action === "edit") {
         const { data, error } = await supabase
           .from("visa_demo_records")
-          .select("id, reference_number, visa_category, status, note")
+          .select("id, reference_number, visa_category, status, notes")
           .eq("id", recordId)
           .single();
 
