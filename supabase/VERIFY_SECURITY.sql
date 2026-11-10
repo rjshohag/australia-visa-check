@@ -43,7 +43,7 @@ select role_name,
        has_table_privilege(role_name, 'public.visa_demo_records', 'UPDATE') as can_update,
        has_table_privilege(role_name, 'public.visa_demo_records', 'DELETE') as can_delete,
        has_table_privilege(role_name, 'public.visa_admins', 'SELECT') as can_read_admin_allowlist
-from (values ('anon'), ('authenticated'), ('public')) as roles(role_name);
+from (values ('anon'), ('authenticated')) as roles(role_name);
 
 -- 6. Function owner, SECURITY DEFINER, volatility, settings, ACL, and body.
 select p.oid::regprocedure as function_name,
